@@ -4,7 +4,8 @@ import { test, expect, type Page } from '@playwright/test';
 // Define a hook that runs before each test case to set up the initial state
 test.beforeEach(async ({ page }) => {
   // Navigate the browser to the TodoMVC demo application URL
-  await page.goto('https://demo.playwright.dev/todomvc');
+  await page.goto('https://demo.playwright.dev/todomvc/#/');
+ 
 });
 
 // Define a constant array containing sample todo items for testing
@@ -19,25 +20,41 @@ test.describe('New Todo', () => {
   // Define a test case to verify that multiple todo items can be added
   test('should allow me to add todo items', async ({ page }) => {
     // 1 Create 1st TODO by selecting locator
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).click();
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).fill('buy some cheese');
 
     // 2 Simulate pressing the Enter key to add the item to the list
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).press('Enter');
 
     // 3 Assert that the list contains exactly the first todo item by checking the 'todo-title' elements
+    await expect(page.getByTestId('todo-title')).toBeVisible();
 
     // 4 Create 2nd TODO
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).click();
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).fill('feed the cat');
 
     // 5 Simulate pressing the Enter key to add the second item
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).press('Enter');
 
     // 6 Assert that the list now contains both the first and second items in the correct order
+    await expect(page.getByTestId('todo-title')).toHaveText([
+      'buy some cheese',
+      'feed the cat'
+]);
+
   });
 
   // Define a test case to ensure the input field is cleared after an item is added
   test('should clear text input field when an item is added', async ({ page }) => {
     // 7 Fill the input with the first sample item
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).click();
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).fill('buy some cheese');
 
     // 8 Press Enter to submit the item
+    await page.getByRole('textbox', { name: 'What needs to be done?' }).press('Enter');
 
     // 9 Assert that the input field is empty after the submission
+    await expect(page.getByRole('textbox', { name: 'What needs to be done?' })).toBeEmpty();
   });
 
   // Define a test case to verify that new items are added to the end of the list
@@ -46,14 +63,19 @@ test.describe('New Todo', () => {
     await createDefaultTodos(page);
 
     // 10 Create a locator for the element that displays the remaining item count
+     const todoCount = page.getByTestId('todo-count');
 
     // 11 Assert that the text "3 items left" is visible on the page
+    await expect(page.getByText('3 items left')).toBeVisible();
 
     // 12 Assert that the specific todo count locator has the exact text "3 items left"
-    
+    await expect(todoCount).toHaveText('3 items left');
+
     // 13 Assert that the todo count locator contains the character "3"
+    await expect(todoCount).toContainText('3');
 
     // 14 Assert that the todo count locator matches a regular expression for the number 3
+    await expect(todoCount).toHaveText(/3/);
 
     // 15 Assert that the entire list of 'todo-title' elements matches our TODO_ITEMS array exactly
     await expect(page.getByTestId('todo-title')).toHaveText(TODO_ITEMS);
@@ -71,9 +93,14 @@ test.describe('Mark all as completed', () => {
   // Define a test case to verify that the 'Mark all' checkbox works
   test('should allow me to mark all items as completed', async ({ page }) => {
     // 16 Locate the toggle-all checkbox by its label and check it. This mean it need to complete all todos
+     await page.getByLabel('Mark all as complete').check();
 
     // 17 Assert that every todo item now has the CSS class 'completed'.
-
+   await expect(page.getByTestId('todo-item')).toHaveClass([
+    'completed',
+    'completed',
+    'completed'
+  ]);
   });
 });
 
