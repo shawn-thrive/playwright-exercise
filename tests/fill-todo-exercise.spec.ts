@@ -31,6 +31,8 @@ test.describe('New Todo', () => {
     // 6 Assert that the list now contains both the first and second items in the correct order
   });
 
+
+
   // Define a test case to ensure the input field is cleared after an item is added
   test('should clear text input field when an item is added', async ({ page }) => {
     // 7 Fill the input with the first sample item
@@ -39,6 +41,8 @@ test.describe('New Todo', () => {
 
     // 9 Assert that the input field is empty after the submission
   });
+
+
 
   // Define a test case to verify that new items are added to the end of the list
   test('should append new items to the bottom of the list', async ({ page }) => {
@@ -93,6 +97,8 @@ test.describe('Item', () => {
       await newTodo.press('Enter');
     }
 
+
+
     // Locate the first todo item in the list (index 0)
     const firstTodo = page.getByTestId('todo-item').nth(0);
     // Find the checkbox within that first item and check it
@@ -107,9 +113,14 @@ test.describe('Item', () => {
     // 20 Find the checkbox within the second item and check it
 
     // 21 Final assertion that BOTH items now have the 'completed' class
+    const secondTodo = page.getByTestId('todo-item').nth(1);
+
     await expect(firstTodo).toHaveClass('completed');
     // 21 NOTE: The code above just assert the first item
   });
+
+
+
 
   // Define a test case for un-marking a completed item
   test('should allow me to un-mark items as complete', async ({ page }) => {
@@ -132,16 +143,19 @@ test.describe('Item', () => {
     // Mark the first item as complete
     await firstTodoCheckbox.check();
     // 22 & 23 Verify the first item is completed and the second is not
-    // 22
+    // 22  
+
     // 23 
 
     // Uncheck the checkbox for the first item
     await firstTodoCheckbox.uncheck();
     // Verify that neither item is marked as completed anymore. NOTE: The current code only marks one item
-    // 24 
-
-    await expect(secondTodo).not.toHaveClass('completed');
+    // 24  
+   
   });
+
+
+
 
   // Define a test case for editing existing items
   test('should allow me to edit an item', async ({ page }) => {
@@ -154,12 +168,17 @@ test.describe('Item', () => {
     const secondTodo = todoItems.nth(1);
     // Double-click the item to enter editing mode
     await secondTodo.dblclick();
+
     // 25 Assert that the editing textbox appears and contains the current text
+    const editInput = secondTodo.getByRole('textbox', {name: 'Edit'});
 
     // 26 Fill the editing textbox with new text
+    await expect(editInput).toBeVisible();
 
     // 27 Press Enter to save the changes
+    await expect(editInput).toHaveValue(TODO_ITEMS[1]);
 
+  
     // Verify the list contains the original first item, the updated second item, and the original third item
     await expect(todoItems).toHaveText([
       TODO_ITEMS[0],
@@ -168,6 +187,9 @@ test.describe('Item', () => {
     ]);
   });
 });
+
+
+
 
 // Group tests for specific editing behaviors
 test.describe('Editing', () => {
@@ -182,6 +204,7 @@ test.describe('Editing', () => {
     const todoItem = page.getByTestId('todo-item').nth(1);
     // Enter edit mode
     await todoItem.dblclick();
+
     // 28 Assert that the completion checkbox is no longer visible
 
     // Assert that the text label is also hidden
@@ -190,12 +213,17 @@ test.describe('Editing', () => {
     })).not.toBeVisible();
   });
 
+
+
+
+
   // Test that an item is deleted if its text is cleared during an edit
   test('should remove the item if an empty text string was entered', async ({ page }) => {
     // Create a locator for all items
     const todoItems = page.getByTestId('todo-item');
     // Edit the second item
     await todoItems.nth(1).dblclick();
+
     // 29 Clear the text entirely
 
     // Submit the empty value
@@ -209,6 +237,10 @@ test.describe('Editing', () => {
   });
 });
 
+
+
+
+//merge checking 
 // Group tests for the item counter functionality
 test.describe('Counter', () => {
   // Test that the counter updates correctly as items are added
@@ -223,6 +255,8 @@ test.describe('Counter', () => {
     await newTodo.press('Enter');
 
     // 30 Verify counter shows 1 item
+    await expect(todoCount).toHaveText('1 item left');
+
 
     // Add the second item
     await newTodo.fill(TODO_ITEMS[1]);
@@ -231,12 +265,19 @@ test.describe('Counter', () => {
   });
 });
 
+
+
+
+
 // Group tests for the "Clear completed" button
 test.describe('Clear completed button', () => {
   // Set up the default state
   test.beforeEach(async ({ page }) => {
     await createDefaultTodos(page);
   });
+
+
+
 
   // Test that the button is visible only when there are completed items
   test('should display the correct text', async ({ page }) => {
@@ -257,7 +298,7 @@ test.describe('Clear completed button', () => {
     // 36 Assert only 2 items remain
 
     // 37 Assert the correct items (first and third) remain in the list
-
+       
   });
 
   // Test that the button disappears when no completed items are left
@@ -270,6 +311,10 @@ test.describe('Clear completed button', () => {
     
   });
 });
+
+
+
+
 
 // Helper function to create the standard set of three todo items
 async function createDefaultTodos(page: Page) {
